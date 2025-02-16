@@ -34,6 +34,7 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values(insertUser)
       .returning();
+    console.log("Created user:", user);
     return user;
   }
 

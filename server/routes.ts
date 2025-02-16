@@ -14,16 +14,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: "testdoctor",
         password: "testpassword",
         name: "Test Doctor",
-        role: "user" as const
+        role: "doctor" as const
       };
 
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(doctorData.username);
       if (existingUser) {
+        console.log("Doctor account exists:", existingUser);
         return res.status(400).json({ message: "Test doctor account already exists" });
       }
 
       const hashedPassword = await hashPassword(doctorData.password);
+      console.log("Creating doctor with data:", { ...doctorData, password: "[REDACTED]" });
+      
       const user = await storage.createUser({
         ...doctorData,
         password: hashedPassword
