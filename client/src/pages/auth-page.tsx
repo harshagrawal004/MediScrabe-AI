@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +20,14 @@ export default function AuthPage() {
     return <Redirect to="/" />;
   }
 
+  const handleSubmit = async (data: { username: string; password: string }) => {
+    try {
+      await loginMutation.mutate(data);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen grid md:grid-cols-2">
       <div className="relative flex items-center justify-center p-8 bg-background/95 backdrop-blur-sm">
@@ -35,7 +42,7 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <form
-              onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))}
+              onSubmit={loginForm.handleSubmit(handleSubmit)}
               className="space-y-6"
             >
               <div className="space-y-2">
@@ -46,12 +53,17 @@ export default function AuthPage() {
                   <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
                   <Input
                     id="username"
-                    {...loginForm.register("username")}
+                    {...loginForm.register("username", { required: "Username is required" })}
                     className="pl-10 bg-background/60 dark:bg-background/40 backdrop-blur-sm"
                     placeholder="Enter your username"
-                    required
+                    autoComplete="username"
                   />
                 </div>
+                {loginForm.formState.errors.username && (
+                  <p className="text-sm text-destructive">
+                    {loginForm.formState.errors.username.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
@@ -62,10 +74,10 @@ export default function AuthPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    {...loginForm.register("password")}
+                    {...loginForm.register("password", { required: "Password is required" })}
                     className="pl-10 pr-10 bg-background/60 dark:bg-background/40 backdrop-blur-sm"
                     placeholder="••••••••"
-                    required
+                    autoComplete="current-password"
                   />
                   <button
                     type="button"
@@ -79,7 +91,17 @@ export default function AuthPage() {
                     )}
                   </button>
                 </div>
+                {loginForm.formState.errors.password && (
+                  <p className="text-sm text-destructive">
+                    {loginForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
+              {loginMutation.error && (
+                <p className="text-sm text-destructive text-center">
+                  {loginMutation.error.message}
+                </p>
+              )}
               <Button
                 type="submit"
                 className="w-full font-semibold py-6 bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90"

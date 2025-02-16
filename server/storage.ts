@@ -11,31 +11,47 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     this.sessionStore = new (PostgresStore(session))({
-      createTableIfMissing: true,
       conObject: {
         connectionString: process.env.DATABASE_URL,
       },
+      createTableIfMissing: true,
+      tableName: 'session', // Use the existing session table
+      pruneSessionInterval: 60 * 15, // Prune expired sessions every 15 minutes
     });
   }
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.username, username));
+      return user;
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    console.log("Created user:", user);
-    return user;
+    try {
+      const [user] = await db
+        .insert(users)
+        .values(insertUser)
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   // Record methods

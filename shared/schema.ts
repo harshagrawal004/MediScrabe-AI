@@ -32,7 +32,7 @@ export const insertUserSchema = createInsertSchema(users, {
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  role: z.enum(["user", "admin"]).default("user"),
+  role: z.enum(["user", "admin", "doctor"]).default("user"),
 }).omit({ id: true, createdAt: true });
 
 export const insertRecordSchema = createInsertSchema(records, {
