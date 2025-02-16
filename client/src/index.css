@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Updated purple color palette to match the screenshot */
+    /* Updated purple color palette with improved contrast */
     --background: 270 100% 99%;
     --foreground: 270 47% 11%;
     --card: 0 0% 100%;
@@ -33,6 +33,28 @@
     --glass-bg: rgba(255, 255, 255, 0.8);
     --glass-border: rgba(147, 51, 234, 0.1);
     --blur-amount: 16px;
+  }
+
+  .dark {
+    --background: 270 50% 3%;
+    --foreground: 270 40% 98%;
+    --card: 270 50% 4%;
+    --card-foreground: 270 40% 98%;
+    --popover: 270 50% 4%;
+    --popover-foreground: 270 40% 98%;
+    --primary: 265 89% 50%;
+    --primary-foreground: 270 40% 98%;
+    --secondary: 270 32.6% 12.5%;
+    --secondary-foreground: 270 40% 98%;
+    --muted: 270 32.6% 12.5%;
+    --muted-foreground: 270 20.2% 65.1%;
+    --accent: 270 32.6% 12.5%;
+    --accent-foreground: 270 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 270 40% 98%;
+    --border: 270 32.6% 12.5%;
+    --input: 270 32.6% 12.5%;
+    --ring: 270 26.8% 83.9%;
   }
 }
 
@@ -81,8 +103,16 @@
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
-    background-image: radial-gradient(rgba(147, 51, 234, 0.1) 1px, transparent 1px);
-    background-size: 32px 32px;
+    background-image: 
+      linear-gradient(to right, rgba(147, 51, 234, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(147, 51, 234, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .dark body {
+    background-image: 
+      linear-gradient(to right, rgba(147, 51, 234, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(147, 51, 234, 0.1) 1px, transparent 1px);
   }
 
   html {
@@ -96,7 +126,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-purple-50;
+    @apply bg-purple-50 dark:bg-purple-950;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -108,6 +138,6 @@
   }
 
   ::selection {
-    @apply bg-purple-500/20 text-purple-700;
+    @apply bg-purple-500/20 text-purple-700 dark:bg-purple-500/30 dark:text-purple-200;
   }
 }

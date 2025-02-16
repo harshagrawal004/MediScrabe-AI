@@ -2,21 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FeatureCard, BenefitCard } from "@/components/ui/cards";
 import { Mic, Shield, Clock, Brain, Cloud, Lock } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="fixed top-0 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-        <div className="container mx-auto flex h-16 items-center justify-between">
-          <Link href="/">
-            <div className="flex items-center space-x-2 hover:opacity-90 transition-opacity">
-              <img src="/logo.png" alt="MedScribe AI Logo" className="h-8 w-8" />
-              <span className="text-xl font-bold tracking-tight text-primary">
-                MedScribe AI
-              </span>
-            </div>
-          </Link>
+        <div className="container mx-auto flex h-14 items-center justify-between">
           <div className="hidden md:flex space-x-6">
             <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">
               Features
@@ -28,27 +21,29 @@ const LandingPage = () => {
               Contact
             </a>
           </div>
-          <Link href="/auth">
-            <Button>Get Started</Button>
-          </Link>
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            <Link href="/auth">
+              <Button>Get Started</Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32">
+      <section className="relative pt-24 pb-12 md:pt-32 md:pb-20">
         <div className="container">
           <div className="mx-auto max-w-[800px] text-center">
             <div className="animate-float mb-8">
               <img 
                 src="/logo.png" 
                 alt="MedScribe AI Logo" 
-                className="mx-auto h-24 w-24"
+                className="mx-auto h-28 w-28 md:h-32 md:w-32"
               />
             </div>
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Transform Your
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary/90 via-primary to-primary/90">
-                {" "}Medical Practice
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary/90 via-primary to-primary/90">
+                MedScribe AI
               </span>
             </h1>
             <p className="mb-8 text-xl text-muted-foreground">
@@ -70,15 +65,15 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-muted/30">
+      <section id="features" className="py-12 md:py-16 bg-muted/30">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl font-bold tracking-tight mb-4">Powerful Features</h2>
             <p className="text-muted-foreground max-w-[600px] mx-auto">
               Everything you need to streamline your medical documentation workflow
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
               icon={Mic}
               title="Advanced Voice Recognition"
@@ -114,15 +109,15 @@ const LandingPage = () => {
       </section>
 
       {/* Benefits Section */}
-      <section id="benefits" className="py-20">
+      <section id="benefits" className="py-12 md:py-16 bg-background">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl font-bold tracking-tight mb-4">Why Choose MedScribe AI</h2>
             <p className="text-muted-foreground max-w-[600px] mx-auto">
               Experience the benefits of AI-powered medical transcription
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 md:gap-6 md:grid-cols-2">
             <BenefitCard
               title="Save Valuable Time"
               description="Reduce documentation time by up to 60% with automated transcription and analysis."
@@ -144,11 +139,11 @@ const LandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-muted/30">
+      <section id="contact" className="py-12 md:py-16 bg-muted/30">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold tracking-tight mb-4">Get Started Today</h2>
-            <p className="text-muted-foreground max-w-[600px] mx-auto mb-8">
+            <p className="text-muted-foreground max-w-[600px] mx-auto mb-6">
               Join thousands of healthcare professionals already using MedScribe AI
             </p>
             <Link href="/auth">
@@ -157,7 +152,7 @@ const LandingPage = () => {
               </Button>
             </Link>
           </div>
-          <div className="mt-12 text-center space-y-4">
+          <div className="mt-8 text-center space-y-3">
             <p className="text-muted-foreground">Questions? Contact our support team</p>
             <p className="text-lg">contact@medscribeai.com</p>
             <p className="text-lg">(555) 123-4567</p>
