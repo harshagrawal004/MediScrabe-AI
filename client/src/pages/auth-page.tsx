@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Redirect } from "wouter";
-import { Stethoscope, LockIcon, UserIcon } from "lucide-react";
+import { Stethoscope, LockIcon, UserIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { useState } from "react";
 
 export default function AuthPage() {
   const { user, loginMutation } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm({
     defaultValues: { username: "", password: "" },
@@ -59,12 +61,23 @@ export default function AuthPage() {
                   <LockIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     {...loginForm.register("password")}
-                    className="pl-10 bg-background/60 dark:bg-background/40 backdrop-blur-sm"
+                    className="pl-10 pr-10 bg-background/60 dark:bg-background/40 backdrop-blur-sm"
                     placeholder="••••••••"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-muted-foreground/60 hover:text-muted-foreground"
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
               </div>
               <Button
