@@ -1,0 +1,196 @@
+Create a HIPAA-compliant medical consultation recording and transcription web application with the following detailed specifications:
+
+1. Authentication System
+Login Page:
+Email/password login form
+Password reset functionality
+Remember me option
+Secure session management
+Failed login attempt tracking
+Password requirements display
+Security Features:
+JWT token authentication
+Session timeout after 15 minutes inactivity
+Secure password hashing
+HIPAA-compliant security measures
+2. Main Dashboard
+Header:
+Doctor's name and profile picture
+Notification bell
+Settings menu
+Logout option
+Statistics Display:
+Total consultations this month
+Total recording minutes
+Pending transcriptions
+Completed consultations
+Recent Activity:
+Latest consultations list
+Status indicators
+Quick action buttons
+Large 'Record Now' button prominently displayed
+Search and Filter:
+Search by patient name
+Date range filter
+Status filter
+Department filter
+3. Patient Details Form
+Modal form triggered by 'Record Now':
+Required Fields:
+Patient First Name (alphabets only, 2-50 chars)
+Patient Last Name (alphabets only, 2-50 chars)
+Age (numeric, 0-150)
+Gender (dropdown)
+Date (auto-filled, editable)
+Patient ID (auto-generated)
+Validation:
+Real-time field validation
+Error messages
+Form completion check
+Buttons:
+'Proceed to Recording'
+'Cancel'
+'Save as Draft'
+4. Recording Interface
+Header Section:
+Patient details summary
+Session duration
+Current date/time
+Recording Controls:
+Large microphone button/icon
+Start/Stop/Pause buttons
+Audio level visualization
+Recording timer
+Quality indicator
+Status Indicators:
+Microphone status
+Connection status
+Storage space
+Emergency Save Option
+Audio Preview Feature
+5. N8n Integration
+Webhook Configuration:
+Endpoint setup
+Authentication headers
+Error handling
+Data Transmission:
+Audio file (WAV/MP3)
+Patient metadata
+Session information
+Response Handling:
+Status tracking
+Progress updates
+Error recovery
+Real-time Updates:
+Processing status
+Completion notifications
+Error alerts
+6. Results Display Page
+Consultation Summary:
+Patient information
+Recording details
+Session metadata
+Content Sections:
+Audio playback player
+Full transcription text
+AI-generated summary
+Key points extracted
+Action items
+Medical terminology highlighted
+Interactive Features:
+Text highlighting
+Note adding
+Edit suggestions
+Export Options:
+PDF report
+Audio download
+Raw transcription
+Summary only
+7. Technical Requirements
+Frontend:
+React.js framework
+Responsive design
+Progressive Web App
+Browser compatibility
+Audio Handling:
+WebRTC implementation
+Multiple format support
+Quality optimization
+Data Management:
+Local storage backup
+Secure transmission
+Compression handling
+Error Handling:
+Network issues
+Device problems
+Storage limits
+API failures
+8. UI/UX Requirements
+Color Scheme:
+Primary: Medical blues (#2C4ECF)
+Secondary: Clean whites (#FFFFFF)
+Accent: Professional grays (#F5F5F5)
+Typography:
+Sans-serif fonts
+Clear hierarchy
+Readable sizes
+Layout:
+Responsive grid
+Mobile-first design
+Intuitive navigation
+Feedback:
+Loading spinners
+Progress bars
+Toast notifications
+Error messages
+9. Data Flow
+User Authentication
+Dashboard Access
+Patient Details Entry
+Recording Session
+N8n Webhook Submission
+Processing Status Updates
+Results Display
+Storage and Archival
+10. Security Features
+Data Encryption:
+In-transit encryption
+At-rest encryption
+End-to-end security
+Access Control:
+Role-based access
+IP restrictions
+Device tracking
+Compliance:
+HIPAA requirements
+Data privacy
+Audit logging
+11. Additional Features
+Offline Support:
+Local storage
+Sync when online
+Progress saving
+Backup System:
+Automatic backups
+Recovery options
+Version control
+Analytics:
+Usage statistics
+Performance metrics
+Error tracking
+12. Performance Requirements
+Load Time: < 3 seconds
+Recording Latency: < 100ms
+Real-time Updates: < 500ms
+Response Time: < 1 second
+Uptime: 99.9%
+Ensure the application follows these principles:
+
+Clean, professional medical interface
+Intuitive user experience
+Responsive design
+Clear feedback for all actions
+Accessible interface (WCAG 2.1)
+Performance optimization
+Security first approach
+The application should handle the complete workflow from login to results display, maintaining HIPAA compliance and professional medical standards throughout.
