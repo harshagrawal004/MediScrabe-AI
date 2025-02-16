@@ -28,7 +28,7 @@ const LandingPage = () => {
               <Stars className="h-5 w-5 text-primary animate-pulse" />
             </div>
             <ThemeToggle />
-            <Link href="/auth">
+            <Link href="/app">
               <Button>Get Started</Button>
             </Link>
           </div>
@@ -57,7 +57,7 @@ const LandingPage = () => {
               AI-powered medical transcription that saves time and improves accuracy.
               Secure, HIPAA-compliant, and trusted by healthcare professionals.
             </p>
-            <Link href="/auth">
+            <Link href="/app">
               <Button size="lg" className="px-8 py-6 text-lg font-semibold">
                 Start Using MedScribe AI
               </Button>
