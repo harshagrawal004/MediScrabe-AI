@@ -40,7 +40,7 @@ export function RecordingControls({ onComplete }: RecordingControlsProps) {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
       <CardContent className="pt-6 space-y-6">
         <div className="flex justify-center">
           <Button
@@ -54,7 +54,7 @@ export function RecordingControls({ onComplete }: RecordingControlsProps) {
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Recording Level</span>
             <span>{formatDuration(duration)}</span>
           </div>
@@ -67,16 +67,24 @@ export function RecordingControls({ onComplete }: RecordingControlsProps) {
               <Button
                 variant="outline"
                 onClick={isPaused ? resumeRecording : pauseRecording}
+                className="bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/50"
               >
                 {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
               </Button>
-              <Button variant="outline" onClick={stopRecording}>
+              <Button 
+                variant="outline" 
+                onClick={stopRecording}
+                className="bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/50"
+              >
                 <Square className="h-4 w-4" />
               </Button>
             </>
           )}
           {audioBlob && (
-            <Button onClick={() => onComplete(audioBlob)}>
+            <Button 
+              onClick={() => onComplete(audioBlob)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               <Save className="h-4 w-4 mr-2" />
               Save Recording
             </Button>
@@ -85,7 +93,7 @@ export function RecordingControls({ onComplete }: RecordingControlsProps) {
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`} />
+            <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-muted'}`} />
             <span>{isRecording ? (isPaused ? "Paused" : "Recording") : "Ready"}</span>
           </div>
           <span>WAV - 48kHz</span>

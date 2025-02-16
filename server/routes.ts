@@ -51,36 +51,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: JSON.stringify({
             audioData,
-            consultation: {
-              id: consultation.id,
-              date: consultation.date,
-              duration: updates.duration,
-            },
-            patient: {
-              id: patient.id,
-              patientId: patient.patientId,
-              firstName: patient.firstName,
-              lastName: patient.lastName,
-              age: patient.age,
-              gender: patient.gender,
-            },
-            doctor: {
-              id: req.user.id,
-              name: req.user.name,
-            },
+            metadata: {
+              consultation: {
+                id: consultation.id,
+                date: consultation.date,
+                duration: updates.duration,
+              },
+              patient: {
+                id: patient.id,
+                patientId: patient.patientId,
+                firstName: patient.firstName,
+                lastName: patient.lastName,
+                age: patient.age,
+                gender: patient.gender,
+              },
+              doctor: {
+                id: req.user.id,
+                name: req.user.name,
+              },
+            }
           }),
         });
 
         if (!response.ok) {
           const errorText = await response.text();
           console.error('N8N Error:', errorText);
-          throw new Error('Failed to process audio. Please try again.');
+          throw new Error(`Failed to process audio: ${response.status} ${response.statusText}`);
         }
 
         const n8nResponse = await response.json();
+        console.log('N8N Response:', n8nResponse);
 
         if (typeof n8nResponse === 'object' && n8nResponse !== null) {
           // Update consultation with N8N processing results

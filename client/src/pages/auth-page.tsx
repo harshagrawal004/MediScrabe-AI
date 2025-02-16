@@ -27,9 +27,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2">
-      <div className="flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
+    <div className="min-h-screen grid md:grid-cols-2 transition-colors duration-300">
+      <div className="flex items-center justify-center p-8 bg-background">
+        <Card className="w-full max-w-md border-border/40">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           </CardHeader>
@@ -123,7 +123,7 @@ export default function AuthPage() {
       <div className="hidden md:flex flex-col justify-center p-8 bg-primary text-primary-foreground">
         <div className="max-w-md mx-auto space-y-6">
           <Stethoscope className="h-16 w-16" />
-          <h1 className="text-4xl font-bold">Medical Consultation Recorder</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Medical Consultation Recorder</h1>
           <p className="text-lg opacity-90">
             Securely record and transcribe your medical consultations with our
             HIPAA-compliant platform.

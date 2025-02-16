@@ -13,7 +13,7 @@ export default function ResultsPage() {
   const { data: consultation, isLoading } = useQuery<Consultation>({
     queryKey: ["/api/consultations", consultationId],
     enabled: !!consultationId,
-    refetchInterval: (data) => 
+    refetchInterval: (data) =>
       data?.status === "processing" ? 5000 : false, // Poll every 5s while processing
   });
 
@@ -28,8 +28,8 @@ export default function ResultsPage() {
   const transcription = consultation.transcription as any;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-background">
+      <header className="bg-background/95 border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
@@ -38,7 +38,7 @@ export default function ResultsPage() {
                 Back to Dashboard
               </Link>
             </Button>
-            <h1 className="text-2xl font-bold text-[#2C4ECF]">
+            <h1 className="text-2xl font-bold text-primary">
               Consultation Results
             </h1>
           </div>
@@ -47,17 +47,17 @@ export default function ResultsPage() {
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+          <Card className="bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50 border-border/40">
             <CardHeader>
               <CardTitle>Consultation Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
-                <div className="text-sm text-gray-500">Date</div>
-                <div>{consultation.date ? format(new Date(Number(consultation.date)), "PPP") : "-"}</div>
-                <div className="text-sm text-gray-500">Patient ID</div>
+                <div className="text-sm text-muted-foreground">Date</div>
+                <div>{consultation.date ? format(new Date(consultation.date), "PPP") : "-"}</div>
+                <div className="text-sm text-muted-foreground">Patient ID</div>
                 <div>{consultation.patientId}</div>
-                <div className="text-sm text-gray-500">Duration</div>
+                <div className="text-sm text-muted-foreground">Duration</div>
                 <div>
                   {consultation.duration
                     ? `${Math.floor(consultation.duration / 60)}:${(
@@ -67,7 +67,7 @@ export default function ResultsPage() {
                         .padStart(2, "0")}`
                     : "-"}
                 </div>
-                <div className="text-sm text-gray-500">Status</div>
+                <div className="text-sm text-muted-foreground">Status</div>
                 <div className="capitalize">
                   {consultation.status === "processing" ? (
                     <span className="flex items-center">
@@ -83,20 +83,20 @@ export default function ResultsPage() {
           </Card>
 
           {consultation.status === "completed" && transcription && (
-            <Card>
+            <Card className="bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50 border-border/40">
               <CardHeader>
                 <CardTitle>AI Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {transcription.summary && (
-                  <p className="text-sm text-gray-600">{transcription.summary}</p>
+                  <p className="text-sm text-muted-foreground">{transcription.summary}</p>
                 )}
                 {transcription.keyPoints && (
                   <div>
                     <h4 className="font-medium mb-2">Key Points</h4>
                     <ul className="list-disc list-inside space-y-1">
                       {transcription.keyPoints.map((point: string, i: number) => (
-                        <li key={i} className="text-sm text-gray-600">
+                        <li key={i} className="text-sm text-muted-foreground">
                           {point}
                         </li>
                       ))}
@@ -109,12 +109,12 @@ export default function ResultsPage() {
         </div>
 
         {consultation.status === "completed" && transcription?.text && (
-          <Card>
+          <Card className="bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50 border-border/40">
             <CardHeader>
               <CardTitle>Full Transcription</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="whitespace-pre-wrap text-sm text-gray-600 font-mono">
+              <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-mono">
                 {transcription.text}
               </pre>
             </CardContent>
@@ -123,11 +123,11 @@ export default function ResultsPage() {
 
         {consultation.status === "completed" && (
           <div className="flex justify-end space-x-4">
-            <Button variant="outline">
+            <Button variant="outline" className="bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/50">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/50">
               <FileAudio className="h-4 w-4 mr-2" />
               Download Audio
             </Button>

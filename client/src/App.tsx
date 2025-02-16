@@ -27,11 +27,11 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <ThemeProvider>
         <AuthProvider>
-          <div className="min-h-screen bg-background text-foreground">
-            <ThemeToggle />
+          <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
             <Router />
+            <ThemeToggle />
             <Toaster />
           </div>
         </AuthProvider>

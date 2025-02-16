@@ -41,11 +41,11 @@ export default function RecordPage() {
             const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
             const arrayBuffer = reader.result as ArrayBuffer;
             audioContext.decodeAudioData(arrayBuffer, (buffer) => {
-              // Create a lower quality offline context (mono, 16kHz)
+              // Create a lower quality offline context (mono, 8kHz)
               const offlineContext = new OfflineAudioContext(
                 1, // mono
-                Math.floor(buffer.length * 16000 / buffer.sampleRate), // resample to 16kHz
-                16000 // 16kHz sample rate
+                Math.floor(buffer.length * 8000 / buffer.sampleRate), // resample to 8kHz
+                8000 // 8kHz sample rate
               );
 
               const source = offlineContext.createBufferSource();
@@ -53,10 +53,10 @@ export default function RecordPage() {
 
               // Add compression
               const compressor = offlineContext.createDynamicsCompressor();
-              compressor.threshold.value = -50;
-              compressor.knee.value = 40;
+              compressor.threshold.value = -24;
+              compressor.knee.value = 30;
               compressor.ratio.value = 12;
-              compressor.attack.value = 0;
+              compressor.attack.value = 0.003;
               compressor.release.value = 0.25;
 
               source.connect(compressor);
@@ -64,7 +64,7 @@ export default function RecordPage() {
 
               source.start();
               offlineContext.startRendering().then((renderedBuffer) => {
-                const wavBlob = bufferToWav(renderedBuffer);
+                const wavBlob = bufferToWav(renderedBuffer, 8000);
                 resolve(wavBlob);
               }).catch(reject);
             }, reject);
@@ -83,7 +83,7 @@ export default function RecordPage() {
             // Check size before sending
             const sizeInMB = (base64Data.length * 0.75) / (1024 * 1024); // Convert base64 length to MB
             if (sizeInMB > 45) { // Allow some buffer from the 50MB limit
-              reject(new Error('Recording is too large. Please try a shorter recording or lower quality.'));
+              reject(new Error('Recording is too large. Please try a shorter recording.'));
               return;
             }
 
@@ -96,7 +96,7 @@ export default function RecordPage() {
         // Send audio file and metadata to server
         await apiRequest("PATCH", `/api/consultations/${consultation.id}`, {
           audioData: base64Audio,
-          duration: Math.floor(compressedBlob.size / 2000), // More accurate duration estimate
+          duration: Math.floor(compressedBlob.size / 1000), // More accurate duration estimate
           status: "processing",
         });
 
@@ -113,6 +113,8 @@ export default function RecordPage() {
       }
     },
     onSuccess: (consultation) => {
+      if (!consultation) return;
+
       queryClient.invalidateQueries({ queryKey: ["/api/consultations"] });
       toast({
         title: "Recording saved",
@@ -130,7 +132,7 @@ export default function RecordPage() {
   });
 
   // Helper function to convert AudioBuffer to WAV blob
-  function bufferToWav(buffer: AudioBuffer): Blob {
+  function bufferToWav(buffer: AudioBuffer, sampleRate: number): Blob {
     const numOfChan = buffer.numberOfChannels;
     const length = buffer.length * numOfChan * 2;
     const view = new DataView(new ArrayBuffer(44 + length));
@@ -143,20 +145,33 @@ export default function RecordPage() {
     view.setUint32(16, 16, true);
     view.setUint16(20, 1, true);
     view.setUint16(22, numOfChan, true);
-    view.setUint32(24, buffer.sampleRate, true);
-    view.setUint32(28, buffer.sampleRate * 2 * numOfChan, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2 * numOfChan, true);
     view.setUint16(32, numOfChan * 2, true);
     view.setUint16(34, 16, true);
     writeString(view, 36, 'data');
     view.setUint32(40, length, true);
 
-    // Write audio data
+    // Write audio data with dynamic range compression
     const data = new Float32Array(buffer.length * numOfChan);
     let offset = 44;
     for (let i = 0; i < buffer.numberOfChannels; i++) {
       const channel = buffer.getChannelData(i);
       for (let j = 0; j < channel.length; j++) {
-        const sample = Math.max(-1, Math.min(1, channel[j]));
+        // Apply soft knee compression
+        let sample = channel[j];
+        const threshold = 0.5;
+        const knee = 0.1;
+        const ratio = 4;
+
+        if (Math.abs(sample) > threshold + knee) {
+          sample = threshold + (Math.abs(sample) - threshold) / ratio * Math.sign(sample);
+        } else if (Math.abs(sample) > threshold - knee) {
+          const T = threshold - knee;
+          const a = (Math.abs(sample) - T) / (2 * knee);
+          sample = T + (1 - 1/ratio) * Math.pow(a, 2) * 2 * knee * Math.sign(sample);
+        }
+
         view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
         offset += 2;
       }
