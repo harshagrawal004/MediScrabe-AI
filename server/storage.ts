@@ -7,7 +7,14 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { users, patients, consultations } from "@shared/schema";
 
-export class DatabaseStorage implements IStorage {
+export import bcrypt from 'bcryptjs';
+
+async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+}
+
+class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {

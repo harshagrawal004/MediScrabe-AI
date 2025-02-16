@@ -4,7 +4,10 @@ import { users, patients, consultations, sessions } from "@shared/schema";
 
 export async function migrate() {
   try {
-    // Create users table
+    // Drop existing tables if needed
+    await db.execute(`DROP TABLE IF EXISTS session CASCADE;`);
+    
+    // Create tables if they don't exist
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -15,7 +18,6 @@ export async function migrate() {
       );
     `);
 
-    // Create patients table
     await db.execute(`
       CREATE TABLE IF NOT EXISTS patients (
         id SERIAL PRIMARY KEY,
@@ -27,7 +29,6 @@ export async function migrate() {
       );
     `);
 
-    // Create consultations table
     await db.execute(`
       CREATE TABLE IF NOT EXISTS consultations (
         id SERIAL PRIMARY KEY,
@@ -41,7 +42,6 @@ export async function migrate() {
       );
     `);
 
-    // Create sessions table
     await db.execute(`
       CREATE TABLE IF NOT EXISTS sessions (
         sid TEXT PRIMARY KEY,
