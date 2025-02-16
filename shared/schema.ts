@@ -11,6 +11,17 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("doctor"),
 });
 
+// Create insert schemas
+export const insertUserSchema = createInsertSchema(users).extend({
+  username: z.string().min(3).max(50),
+  password: z.string().min(6),
+  name: z.string().min(2).max(50),
+});
+
+// Export types
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+
 // Patients table
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
@@ -35,13 +46,6 @@ export const consultations = pgTable("consultations", {
   metadata: jsonb("metadata"),
 });
 
-// Create insert schemas
-export const insertUserSchema = createInsertSchema(users).extend({
-  username: z.string().min(3).max(50),
-  password: z.string().min(6),
-  name: z.string().min(2).max(50),
-});
-
 export const insertPatientSchema = createInsertSchema(patients).extend({
   patientId: z.string().min(3),
   firstName: z.string().min(2),
@@ -60,10 +64,6 @@ export const insertConsultationSchema = createInsertSchema(consultations).extend
   summary: z.string().optional(),
   metadata: z.object({}).optional(),
 });
-
-// Export types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 
 export type InsertPatient = z.infer<typeof insertPatientSchema>;
 export type Patient = typeof patients.$inferSelect;
