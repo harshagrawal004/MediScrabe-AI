@@ -6,7 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import PostgresStore from "connect-pg-simple";
-import { db, sql } from "./db";
+import { db } from "./db";
 import { User as SelectUser } from "@shared/schema";
 
 declare global {
@@ -62,7 +62,7 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy(async (username: string, password: string, done: Function) => {
       try {
         if (!username || !password) {
           return done(null, false, { message: "Username and password are required" });
@@ -89,8 +89,8 @@ export function setupAuth(app: Express) {
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
-  passport.deserializeUser(async (id: number, done) => {
+  passport.serializeUser((user: Express.User, done: Function) => done(null, user.id));
+  passport.deserializeUser(async (id: number, done: Function) => {
     try {
       const user = await storage.getUser(id);
       if (!user) {
@@ -117,9 +117,9 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      const user = await storage.createUser({
+      const user = await storage.createUserWithHashedPassword({
         ...req.body,
-        password: await hashPassword(password),
+        password,
       });
 
       req.login(user, (err) => {
@@ -133,7 +133,7 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
       if (err) {
         console.error('Authentication error:', err);
         return next(err);
