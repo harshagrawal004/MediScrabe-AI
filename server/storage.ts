@@ -19,7 +19,7 @@ export class MemStorage implements IStorage {
     this.consultations = new Map();
     this.currentId = { users: 1, patients: 1, consultations: 1 };
     this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+      checkPeriod: 86400000, // 24 hours
     });
   }
 

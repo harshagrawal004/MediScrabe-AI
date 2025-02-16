@@ -6,8 +6,10 @@ import { insertPatientSchema, insertConsultationSchema } from "@shared/schema";
 import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication routes and middleware
   setupAuth(app);
 
+  // Ensure all API routes are protected by authentication
   app.post("/api/patients", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
@@ -86,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const n8nResponse = await response.json();
         console.log('N8N Response:', n8nResponse);
 
-        if (typeof n8nResponse === 'object' && n8nResponse !== null) {
+        if (n8nResponse && typeof n8nResponse === 'object') {
           // Update consultation with N8N processing results
           updates.transcription = n8nResponse.transcription || null;
           updates.status = "completed";
