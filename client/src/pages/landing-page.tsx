@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { ChevronDown } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -9,12 +10,21 @@ export default function LandingPage() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/">
-              <span className="text-xl font-bold">MediRecord</span>
+              <span className="text-xl font-bold tracking-tight">AUGNITO</span>
             </Link>
             <div className="hidden md:flex gap-6">
-              <Link href="#features">Features</Link>
-              <Link href="#about">About</Link>
-              <Link href="#contact">Contact</Link>
+              <div className="flex items-center gap-1.5">
+                <Link href="#product">Product</Link>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Link href="#company">Company</Link>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Link href="#resources">Resources</Link>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -26,10 +36,10 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 md:pt-40 md:pb-24">
-        <div className="container">
+      <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden">
+        <div className="container relative z-10">
           <div className="max-w-[900px] mx-auto text-center space-y-8">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary/90 to-primary">
               The Optimal AI Assistant for Healthcare
             </h1>
             <p className="text-xl text-muted-foreground max-w-[600px] mx-auto">
@@ -44,13 +54,16 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+        {/* Background pattern */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10" />
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-muted/50">
+      <section id="features" className="py-24 bg-muted/30">
         <div className="container">
-          <div className="grid md:grid-cols-3 gap-10">
-            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background border shadow-sm">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background hover:shadow-lg transition-all duration-300">
               <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +81,7 @@ export default function LandingPage() {
                 HIPAA-compliant audio recording and storage for all your medical consultations
               </p>
             </div>
-            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background border shadow-sm">
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background hover:shadow-lg transition-all duration-300">
               <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +99,7 @@ export default function LandingPage() {
                 Accurate, AI-powered transcription with medical terminology support
               </p>
             </div>
-            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background border shadow-sm">
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-background hover:shadow-lg transition-all duration-300">
               <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
