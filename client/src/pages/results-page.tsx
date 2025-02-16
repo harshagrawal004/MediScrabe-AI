@@ -54,7 +54,7 @@ export default function ResultsPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm text-gray-500">Date</div>
-                <div>{format(new Date(consultation.date), "PPP")}</div>
+                <div>{consultation.date ? format(new Date(Number(consultation.date)), "PPP") : "-"}</div>
                 <div className="text-sm text-gray-500">Patient ID</div>
                 <div>{consultation.patientId}</div>
                 <div className="text-sm text-gray-500">Duration</div>
