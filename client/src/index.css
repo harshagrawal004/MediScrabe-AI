@@ -34,28 +34,6 @@
     --glass-border: rgba(147, 51, 234, 0.1);
     --blur-amount: 16px;
   }
-
-  .dark {
-    --background: 270 50% 3%;
-    --foreground: 270 40% 98%;
-    --card: 270 50% 4%;
-    --card-foreground: 270 40% 98%;
-    --popover: 270 50% 4%;
-    --popover-foreground: 270 40% 98%;
-    --primary: 265 89% 50%;
-    --primary-foreground: 270 40% 98%;
-    --secondary: 270 32.6% 12.5%;
-    --secondary-foreground: 270 40% 98%;
-    --muted: 270 32.6% 12.5%;
-    --muted-foreground: 270 20.2% 65.1%;
-    --accent: 270 32.6% 12.5%;
-    --accent-foreground: 270 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 270 40% 98%;
-    --border: 270 32.6% 12.5%;
-    --input: 270 32.6% 12.5%;
-    --ring: 270 26.8% 83.9%;
-  }
 }
 
 @layer components {
@@ -97,15 +75,6 @@
 
   .hover-lift:hover {
     @apply -translate-y-1 shadow-lg;
-  }
-
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
   }
 }
 
