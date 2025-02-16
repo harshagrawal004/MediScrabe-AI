@@ -9,15 +9,17 @@ import AuthPage from "@/pages/auth-page";
 import RecordPage from "@/pages/record-page";
 import ResultsPage from "@/pages/results-page";
 import NotFound from "@/pages/not-found";
+import LandingPage from "@/pages/landing-page";
 import { ThemeProvider } from "./components/theme-provider"
 import { ThemeToggle } from "./components/theme-toggle"
 
 function Router() {
   return (
     <Switch>
-      <ProtectedRoute path="/" component={HomePage} />
-      <ProtectedRoute path="/record" component={RecordPage} />
-      <ProtectedRoute path="/results/:id" component={ResultsPage} />
+      <Route path="/" component={LandingPage} />
+      <ProtectedRoute path="/app" component={HomePage} />
+      <ProtectedRoute path="/app/record" component={RecordPage} />
+      <ProtectedRoute path="/app/results/:id" component={ResultsPage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
