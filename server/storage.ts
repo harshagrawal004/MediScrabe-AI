@@ -1,10 +1,11 @@
 import { type IStorage } from "./types";
-import { User, InsertUser, Patient, InsertPatient, Consultation, InsertConsultation } from "@shared/schema";
+import { User, InsertUser, Record, InsertRecord } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { users, patients, consultations } from "@shared/schema";
+import { users, records } from "@shared/schema";
 
-class DatabaseStorage implements IStorage {
+export class DatabaseStorage implements IStorage {
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -23,49 +24,35 @@ class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Patient methods
-  async createPatient(patient: InsertPatient): Promise<Patient> {
-    const [newPatient] = await db
-      .insert(patients)
-      .values(patient)
+  // Record methods
+  async createRecord(record: InsertRecord): Promise<Record> {
+    const [newRecord] = await db
+      .insert(records)
+      .values(record)
       .returning();
-    return newPatient;
+    return newRecord;
   }
 
-  async getPatient(id: number): Promise<Patient | undefined> {
-    const [patient] = await db.select().from(patients).where(eq(patients.id, id));
-    return patient;
+  async getRecord(id: number): Promise<Record | undefined> {
+    const [record] = await db.select().from(records).where(eq(records.id, id));
+    return record;
   }
 
-  // Consultation methods
-  async createConsultation(consultation: InsertConsultation): Promise<Consultation> {
-    const [newConsultation] = await db
-      .insert(consultations)
-      .values(consultation)
-      .returning();
-    return newConsultation;
-  }
-
-  async getConsultation(id: number): Promise<Consultation | undefined> {
-    const [consultation] = await db.select().from(consultations).where(eq(consultations.id, id));
-    return consultation;
-  }
-
-  async updateConsultation(id: number, updates: Partial<Consultation>): Promise<Consultation> {
+  async updateRecord(id: number, updates: Partial<Record>): Promise<Record> {
     const [updated] = await db
-      .update(consultations)
+      .update(records)
       .set(updates)
-      .where(eq(consultations.id, id))
+      .where(eq(records.id, id))
       .returning();
     return updated;
   }
 
-  async getDoctorConsultations(doctorId: number): Promise<Consultation[]> {
+  async getUserRecords(userId: number): Promise<Record[]> {
     return db
       .select()
-      .from(consultations)
-      .where(eq(consultations.doctorId, doctorId))
-      .orderBy(consultations.date);
+      .from(records)
+      .where(eq(records.userId, userId))
+      .orderBy(records.createdAt);
   }
 }
 

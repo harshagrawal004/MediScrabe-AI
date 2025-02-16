@@ -38,10 +38,21 @@ app.use((req, res, next) => {
   next();
 });
 
+let server: ReturnType<typeof createServer>;
+
+process.on('SIGTERM', () => {
+  if (server) {
+    server.close(() => {
+      console.log('Server terminated');
+      process.exit(0);
+    });
+  }
+});
+
 (async () => {
   try {
     await migrate(); // Run migrations before starting the server
-    const server = await registerRoutes(app);
+    server = await registerRoutes(app);
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -57,8 +68,8 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, "0.0.0.0", () => {
+    const PORT = Number(process.env.PORT) || 5000;
+    server.listen(PORT, () => {
       log(`serving on port ${PORT}`);
     });
   } catch (error) {

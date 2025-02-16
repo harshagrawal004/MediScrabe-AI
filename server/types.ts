@@ -1,21 +1,15 @@
-import { User, Patient, Consultation, InsertUser, InsertPatient, InsertConsultation } from "@shared/schema";
+import { User, Record, InsertUser, InsertRecord } from "@shared/schema";
 import session from "express-session";
 
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByName(name: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  createUserWithHashedPassword(user: InsertUser): Promise<User>;
 
-  // Patient methods
-  createPatient(patient: InsertPatient): Promise<Patient>;
-  getPatient(id: number): Promise<Patient | undefined>;
-
-  // Consultation methods
-  createConsultation(consultation: InsertConsultation): Promise<Consultation>;
-  getConsultation(id: number): Promise<Consultation | undefined>;
-  updateConsultation(id: number, updates: Partial<Consultation>): Promise<Consultation>;
-  getDoctorConsultations(doctorId: number): Promise<Consultation[]>;
+  // Record methods
+  createRecord(record: InsertRecord): Promise<Record>;
+  getRecord(id: number): Promise<Record | undefined>;
+  updateRecord(id: number, updates: Partial<Record>): Promise<Record>;
+  getUserRecords(userId: number): Promise<Record[]>;
 }

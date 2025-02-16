@@ -133,7 +133,7 @@ export function setupAuth(app: Express) {
         username,
         password: hashedPassword,
         name,
-        role: "doctor",
+        role: "user",
       });
 
       req.login(user, (err) => {
