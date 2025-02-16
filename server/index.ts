@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { migrate } from "./migrations"; // Added import for migrations
 
 const app = express();
 // Increase JSON payload limit to 50MB
@@ -59,3 +59,8 @@ app.use((req, res, next) => {
     log(`serving on port ${PORT}`);
   });
 })();
+
+async function main() {
+  await migrate(); // Run migrations before starting the server
+  const app = express();
+}
