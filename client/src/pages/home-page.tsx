@@ -14,15 +14,15 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#2C4ECF]">
+              <h1 className="text-2xl font-bold text-primary">
                 Medical Recorder
               </h1>
-              <p className="text-sm text-gray-500">Welcome, Dr. {user?.name}</p>
+              <p className="text-sm text-muted-foreground">Welcome, Dr. {user?.name}</p>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="outline" onClick={() => logoutMutation.mutate()}>

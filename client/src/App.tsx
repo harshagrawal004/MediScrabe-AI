@@ -9,6 +9,8 @@ import AuthPage from "@/pages/auth-page";
 import RecordPage from "@/pages/record-page";
 import ResultsPage from "@/pages/results-page";
 import NotFound from "@/pages/not-found";
+import { ThemeProvider } from "./components/theme-provider"
+import { ThemeToggle } from "./components/theme-toggle"
 
 function Router() {
   return (
@@ -22,13 +24,10 @@ function Router() {
   );
 }
 
-import { ThemeProvider } from "./components/theme-provider"
-import { ThemeToggle } from "./components/theme-toggle"
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <AuthProvider>
           <div className="min-h-screen bg-background text-foreground">
             <ThemeToggle />

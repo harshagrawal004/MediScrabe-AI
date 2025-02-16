@@ -75,17 +75,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to process audio');
+          const errorText = await response.text();
+          console.error('N8N Error:', errorText);
+          throw new Error('Failed to process audio. Please try again.');
         }
 
         const n8nResponse = await response.json();
 
-        // Update consultation with N8N processing results
-        updates.transcription = n8nResponse.transcription || null;
-        updates.status = "completed";
+        if (typeof n8nResponse === 'object' && n8nResponse !== null) {
+          // Update consultation with N8N processing results
+          updates.transcription = n8nResponse.transcription || null;
+          updates.status = "completed";
+        } else {
+          throw new Error('Invalid response from processing service');
+        }
       } catch (error) {
         console.error('N8N processing error:', error);
         updates.status = "failed";
+        return res.status(500).json({ 
+          message: error instanceof Error ? error.message : 'Failed to process audio'
+        });
       }
     }
 

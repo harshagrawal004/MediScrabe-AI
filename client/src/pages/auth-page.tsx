@@ -35,7 +35,7 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
@@ -120,15 +120,15 @@ export default function AuthPage() {
         </Card>
       </div>
 
-      <div className="hidden md:flex flex-col justify-center p-8 bg-[#2C4ECF] text-white">
+      <div className="hidden md:flex flex-col justify-center p-8 bg-primary text-primary-foreground">
         <div className="max-w-md mx-auto space-y-6">
           <Stethoscope className="h-16 w-16" />
           <h1 className="text-4xl font-bold">Medical Consultation Recorder</h1>
-          <p className="text-lg">
+          <p className="text-lg opacity-90">
             Securely record and transcribe your medical consultations with our
             HIPAA-compliant platform.
           </p>
-          <ul className="space-y-2">
+          <ul className="space-y-2 opacity-75">
             <li>✓ Secure audio recording</li>
             <li>✓ Automatic transcription</li>
             <li>✓ Patient management</li>
