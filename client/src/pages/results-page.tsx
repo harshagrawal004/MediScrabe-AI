@@ -2,34 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Consultation, Patient } from "@shared/schema";
-import { ArrowLeft, Download, FileAudio } from "lucide-react";
+import { Consultation } from "@shared/schema";
+import { ArrowLeft, Download, FileAudio, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function ResultsPage() {
   const [, params] = useRoute("/results/:id");
   const consultationId = params?.id;
 
-  const { data: consultation } = useQuery<Consultation>({
+  const { data: consultation, isLoading } = useQuery<Consultation>({
     queryKey: ["/api/consultations", consultationId],
     enabled: !!consultationId,
+    refetchInterval: (data) => 
+      data?.status === "processing" ? 5000 : false, // Poll every 5s while processing
   });
 
-  if (!consultation) {
-    return null;
+  if (isLoading || !consultation) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
-  // Mock transcription data
-  const transcription = {
-    text: "Doctor: Good morning, how are you feeling today?\nPatient: I've been experiencing some headaches lately...",
-    summary: "Patient reports recurring headaches. Recommended further examination.",
-    keyPoints: [
-      "Recurring headaches",
-      "No previous history",
-      "Normal sleep patterns",
-      "No medication taken",
-    ],
-  };
+  const transcription = consultation.transcription as any;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,59 +68,71 @@ export default function ResultsPage() {
                     : "-"}
                 </div>
                 <div className="text-sm text-gray-500">Status</div>
-                <div className="capitalize">{consultation.status}</div>
+                <div className="capitalize">
+                  {consultation.status === "processing" ? (
+                    <span className="flex items-center">
+                      Processing
+                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    </span>
+                  ) : (
+                    consultation.status
+                  )}
+                </div>
               </div>
-              {consultation.audioUrl && (
-                <audio
-                  controls
-                  className="w-full mt-4"
-                  src={consultation.audioUrl}
-                />
-              )}
             </CardContent>
           </Card>
 
+          {consultation.status === "completed" && transcription && (
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {transcription.summary && (
+                  <p className="text-sm text-gray-600">{transcription.summary}</p>
+                )}
+                {transcription.keyPoints && (
+                  <div>
+                    <h4 className="font-medium mb-2">Key Points</h4>
+                    <ul className="list-disc list-inside space-y-1">
+                      {transcription.keyPoints.map((point: string, i: number) => (
+                        <li key={i} className="text-sm text-gray-600">
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {consultation.status === "completed" && transcription?.text && (
           <Card>
             <CardHeader>
-              <CardTitle>AI Summary</CardTitle>
+              <CardTitle>Full Transcription</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-gray-600">{transcription.summary}</p>
-              <div>
-                <h4 className="font-medium mb-2">Key Points</h4>
-                <ul className="list-disc list-inside space-y-1">
-                  {transcription.keyPoints.map((point, i) => (
-                    <li key={i} className="text-sm text-gray-600">
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <CardContent>
+              <pre className="whitespace-pre-wrap text-sm text-gray-600 font-mono">
+                {transcription.text}
+              </pre>
             </CardContent>
           </Card>
-        </div>
+        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Full Transcription</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="whitespace-pre-wrap text-sm text-gray-600 font-mono">
-              {transcription.text}
-            </pre>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end space-x-4">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
-          </Button>
-          <Button variant="outline">
-            <FileAudio className="h-4 w-4 mr-2" />
-            Download Audio
-          </Button>
-        </div>
+        {consultation.status === "completed" && (
+          <div className="flex justify-end space-x-4">
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
+            <Button variant="outline">
+              <FileAudio className="h-4 w-4 mr-2" />
+              Download Audio
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -32,11 +32,19 @@ export default function RecordPage() {
       });
       const consultation = await consultationRes.json();
 
-      // Then upload the audio file
-      const formData = new FormData();
-      formData.append("audio", audioBlob);
+      // Convert audio blob to base64 for transmission
+      const base64Audio = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          resolve(base64String.split(',')[1]); // Remove data URL prefix
+        };
+        reader.readAsDataURL(audioBlob);
+      });
+
+      // Send audio file and metadata to server
       await apiRequest("PATCH", `/api/consultations/${consultation.id}`, {
-        audioUrl: "dummy-url", // In a real app, we'd upload to storage
+        audioData: base64Audio,
         duration: Math.floor(audioBlob.size / 16000), // Rough estimate
         status: "processing",
       });
@@ -45,6 +53,10 @@ export default function RecordPage() {
     },
     onSuccess: (consultation) => {
       queryClient.invalidateQueries({ queryKey: ["/api/consultations"] });
+      toast({
+        title: "Recording saved",
+        description: "Your consultation is being processed...",
+      });
       navigate(`/results/${consultation.id}`);
     },
     onError: (error: Error) => {
