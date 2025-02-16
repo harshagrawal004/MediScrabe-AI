@@ -61,3 +61,9 @@ export type Patient = typeof patients.$inferSelect;
 export type Consultation = typeof consultations.$inferSelect;
 export type InsertPatient = z.infer<typeof insertPatientSchema>;
 export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
+
+export const sessions = pgTable("sessions", {
+  sid: text("sid").primaryKey(),
+  sess: jsonb("sess").notNull(),
+  expire: timestamp("expire").notNull(),
+});

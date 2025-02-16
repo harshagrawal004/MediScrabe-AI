@@ -5,6 +5,8 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+import PostgresStore from "connect-pg-simple";
+import { db } from "./db";
 import { User as SelectUser } from "@shared/schema";
 
 declare global {
@@ -38,7 +40,10 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: storage.sessionStore,
+    store: new (PostgresStore(session))({
+      createTableIfMissing: true,
+      pool: db.driver.pool,
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
