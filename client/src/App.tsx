@@ -22,15 +22,21 @@ function Router() {
   );
 }
 
+import { ThemeProvider } from "./components/theme-provider"
+import { ThemeToggle } from "./components/theme-toggle"
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <div className="dark">
-          <Router />
-          <Toaster />
-        </div>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <div className="min-h-screen bg-background text-foreground">
+            <ThemeToggle />
+            <Router />
+            <Toaster />
+          </div>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
