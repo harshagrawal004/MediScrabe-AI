@@ -4,17 +4,17 @@
 
 @layer base {
   :root {
-    /* Enhanced color palette with more vibrant colors */
-    --background: 220 33% 98%;
-    --foreground: 222 47% 11%;
+    /* Vibrant purple color palette */
+    --background: 270 33% 98%;
+    --foreground: 270 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 270 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 270 47% 11%;
+    --primary: 270 83% 53%;
+    --primary-foreground: 270 40% 98%;
+    --secondary: 270 40% 96.1%;
+    --secondary-foreground: 270 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96.1%;
@@ -116,10 +116,10 @@
     @apply -translate-y-1;
   }
 
-  /* Glass morphism effects */
+  /* Glass morphism effects with purple tint */
   .glass {
     @apply backdrop-blur-md bg-opacity-50;
-    background: var(--glass-bg);
+    background: color-mix(in srgb, var(--glass-bg), rgba(128, 0, 255, 0.05));
     border: 1px solid var(--glass-border);
   }
 
