@@ -9,7 +9,7 @@ interface StatsDisplayProps {
 export function StatsDisplay({ consultations }: StatsDisplayProps) {
   const thisMonth = new Date().getMonth();
   const thisMonthConsultations = consultations.filter(
-    (c) => c.date.getMonth() === thisMonth
+    (c) => new Date(c.date).getMonth() === thisMonth
   );
 
   const totalMinutes = consultations.reduce(
