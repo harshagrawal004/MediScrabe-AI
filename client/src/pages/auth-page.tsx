@@ -4,22 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { insertUserSchema } from "@shared/schema";
 import { Redirect } from "wouter";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Stethoscope } from "lucide-react";
+import { Stethoscope, LockIcon, UserIcon } from "lucide-react";
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, loginMutation } = useAuth();
 
   const loginForm = useForm({
     defaultValues: { username: "", password: "" },
-  });
-
-  const registerForm = useForm({
-    resolver: zodResolver(insertUserSchema),
-    defaultValues: { username: "", password: "", name: "" },
   });
 
   if (user) {
@@ -28,111 +20,90 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen grid md:grid-cols-2 transition-colors duration-300">
-      <div className="flex items-center justify-center p-8 bg-background">
-        <Card className="w-full max-w-md border-border/40">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+      <div className="relative flex items-center justify-center p-8 bg-background/95 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
+        <Card className="w-full max-w-md border-border/40 relative z-10 shadow-xl dark:shadow-purple-500/5">
+          <CardHeader className="space-y-1 text-center pb-8">
+            <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 p-3 mb-2">
+              <LockIcon className="w-full h-full text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="login">
-                <form
-                  onSubmit={loginForm.handleSubmit((data) =>
-                    loginMutation.mutate(data)
-                  )}
-                  className="space-y-4"
-                >
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      {...loginForm.register("username")}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      {...loginForm.register("password")}
-                      required
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loginMutation.isPending}
-                  >
-                    Login
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="register">
-                <form
-                  onSubmit={registerForm.handleSubmit((data) =>
-                    registerMutation.mutate(data)
-                  )}
-                  className="space-y-4"
-                >
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-name">Full Name</Label>
-                    <Input
-                      id="reg-name"
-                      {...registerForm.register("name")}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-username">Username</Label>
-                    <Input
-                      id="reg-username"
-                      {...registerForm.register("username")}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-password">Password</Label>
-                    <Input
-                      id="reg-password"
-                      type="password"
-                      {...registerForm.register("password")}
-                      required
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={registerMutation.isPending}
-                  >
-                    Register
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <form
+              onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))}
+              className="space-y-6"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-sm font-medium">
+                  Username
+                </Label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
+                  <Input
+                    id="username"
+                    {...loginForm.register("username")}
+                    className="pl-10"
+                    placeholder="Enter your username"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <LockIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
+                  <Input
+                    id="password"
+                    type="password"
+                    {...loginForm.register("password")}
+                    className="pl-10"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                className="w-full font-semibold py-6"
+                size="lg"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "Signing in..." : "Sign in"}
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>
 
-      <div className="hidden md:flex flex-col justify-center p-8 bg-primary text-primary-foreground">
-        <div className="max-w-md mx-auto space-y-6">
-          <Stethoscope className="h-16 w-16" />
+      <div className="hidden md:flex flex-col justify-center p-8 bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(147,51,234,0.2)_50%,transparent_75%)] animate-gradient" />
+        <div className="max-w-md mx-auto space-y-8 relative z-10">
+          <Stethoscope className="h-16 w-16 opacity-90" />
           <h1 className="text-4xl font-bold tracking-tight">Medical Consultation Recorder</h1>
           <p className="text-lg opacity-90">
             Securely record and transcribe your medical consultations with our
             HIPAA-compliant platform.
           </p>
-          <ul className="space-y-2 opacity-75">
-            <li>✓ Secure audio recording</li>
-            <li>✓ Automatic transcription</li>
-            <li>✓ Patient management</li>
-            <li>✓ HIPAA compliant</li>
+          <ul className="space-y-3 text-lg opacity-75">
+            <li className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-current" />
+              Secure audio recording
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-current" />
+              Automatic transcription
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-current" />
+              Patient management
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-current" />
+              HIPAA compliant
+            </li>
           </ul>
         </div>
       </div>
