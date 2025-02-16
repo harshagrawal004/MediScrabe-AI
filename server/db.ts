@@ -8,6 +8,6 @@ if (!process.env.DATABASE_URL) {
 }
 
 const connectionString = process.env.DATABASE_URL;
-const queryClient = postgres(connectionString, { max: 1 });
-export const db = drizzle(queryClient) as PostgresJsDatabase;
-export const sql = queryClient;
+const client = postgres(connectionString);
+export const db = drizzle(client);
+export const sql = client;
