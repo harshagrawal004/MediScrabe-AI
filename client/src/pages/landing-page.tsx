@@ -22,20 +22,14 @@ export default function LandingPage() {
               <Link href="#features" className="text-muted-foreground hover:text-primary transition-colors">
                 Features
               </Link>
-              <Link href="#about" className="text-muted-foreground hover:text-primary transition-colors">
-                About
-              </Link>
-              <Link href="#pricing" className="text-muted-foreground hover:text-primary transition-colors">
-                Pricing
+              <Link href="#contact" className="text-muted-foreground hover:text-primary transition-colors">
+                Contact Us
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth">
               <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/auth">
-              <Button variant="default">Get Started</Button>
             </Link>
           </div>
         </div>
@@ -57,15 +51,10 @@ export default function LandingPage() {
               AI-powered medical transcription that saves time and improves accuracy.
               HIPAA-compliant, secure, and trusted by healthcare professionals.
             </p>
-            <div className="pt-4 flex gap-4 justify-center">
+            <div className="pt-4 flex justify-center">
               <Link href="/auth">
                 <Button size="lg" className="font-semibold px-8">
-                  Start Free Trial
-                </Button>
-              </Link>
-              <Link href="#features">
-                <Button size="lg" variant="outline" className="font-semibold px-8">
-                  Learn More
+                  Get Started
                 </Button>
               </Link>
             </div>
@@ -141,6 +130,23 @@ export default function LandingPage() {
                 Seamlessly integrates with your existing medical records system
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 bg-muted/50">
+        <div className="container">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Contact Us</h2>
+            <p className="text-muted-foreground max-w-[600px] mx-auto">
+              Get in touch with us for any questions about MedScribe AI
+            </p>
+          </div>
+          <div className="max-w-lg mx-auto text-center space-y-4">
+            <p className="text-lg">Email: contact@medscribeai.com</p>
+            <p className="text-lg">Phone: (555) 123-4567</p>
+            <p className="text-lg">Hours: Monday - Friday, 9:00 AM - 5:00 PM EST</p>
           </div>
         </div>
       </section>
