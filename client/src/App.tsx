@@ -29,11 +29,11 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="light">
         <AuthProvider>
           <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
             <Router />
-            <ThemeToggle />
+            <ThemeToggle className="fixed bottom-4 right-4" />
             <Toaster />
           </div>
         </AuthProvider>
