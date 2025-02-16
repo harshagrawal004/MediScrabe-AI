@@ -24,6 +24,9 @@ export async function hashPassword(password: string) {
 }
 
 async function comparePasswords(supplied: string, stored: string) {
+  if (!stored || !stored.includes('.')) {
+    return false;
+  }
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -106,17 +109,8 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
-      if (!user) {
-        return res.status(401).json({ message: info?.message || "Authentication failed" });
-      }
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(200).json(user);
-      });
-    })(req, res, next);
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    res.status(200).json(req.user);
   });
 
   app.post("/api/logout", (req, res, next) => {
