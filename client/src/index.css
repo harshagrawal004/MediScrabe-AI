@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* Enhanced color palette with more vibrant colors */
     --background: 220 33% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -24,6 +25,14 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --radius: 0.75rem;
+
+    /* New modern variables */
+    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px -4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px -8px rgba(0, 0, 0, 0.15);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --blur-amount: 10px;
   }
 
   .dark {
@@ -46,14 +55,92 @@
     --border: 217.2 32.6% 12.5%;
     --input: 217.2 32.6% 12.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Dark mode specific shadows */
+    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+    --glass-bg: rgba(18, 18, 18, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@layer components {
+  /* Modern card styles */
+  .glass-card {
+    @apply backdrop-blur-md bg-opacity-50 border border-opacity-50;
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Modern button styles */
+  .btn-modern {
+    @apply relative overflow-hidden transition-all duration-300 ease-out;
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+  }
+
+  .btn-modern:hover {
+    @apply transform scale-105;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Modern input styles */
+  .input-modern {
+    @apply border-0 bg-opacity-50 backdrop-blur-sm transition-all duration-300;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .input-modern:focus {
+    @apply ring-2 ring-primary/50 transform scale-[1.02];
+    box-shadow: var(--shadow-md);
   }
 }
 
 @layer utilities {
-  .transition-colors {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
+  /* Enhanced transitions */
+  .transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-transform {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Modern hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-1;
+  }
+
+  /* Glass morphism effects */
+  .glass {
+    @apply backdrop-blur-md bg-opacity-50;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Modern animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary;
   }
 }
 
@@ -63,7 +150,41 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased min-h-screen;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Modern scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/70;
+  }
+
+  /* Better focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/50 ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary/20 text-primary;
   }
 }
