@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FeatureCard, BenefitCard } from "@/components/ui/cards";
-import { Mic, Shield, Clock, Brain, Cloud, Lock, Sparkles, Stars } from "lucide-react";
+import { Mic, Shield, Clock, Brain, Cloud, Lock, Sparkles, Stars, Stethoscope } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const LandingPage = () => {
@@ -40,11 +40,9 @@ const LandingPage = () => {
         <div className="container">
           <div className="mx-auto max-w-[800px] text-center">
             <div className="animate-float mb-8">
-              <img 
-                src="/logo.png" 
-                alt="MedScribe AI Logo" 
-                className="mx-auto h-28 w-28 md:h-32 md:w-32"
-              />
+              <div className="mx-auto h-28 w-28 md:h-32 md:w-32 text-primary">
+                <Stethoscope className="w-full h-full" strokeWidth={1.5} />
+              </div>
             </div>
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary/90 via-primary to-primary/90">
