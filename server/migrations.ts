@@ -3,11 +3,6 @@ import { users, records } from "@shared/schema";
 
 export async function migrate() {
   try {
-    // Drop existing tables if they exist
-    await db.execute(`DROP TABLE IF EXISTS users CASCADE;`);
-    await db.execute(`DROP TABLE IF EXISTS sessions CASCADE;`);
-    await db.execute(`DROP TABLE IF EXISTS records CASCADE;`);
-
     // Create tables if they don't exist
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
@@ -35,10 +30,11 @@ export async function migrate() {
     `);
 
     await db.execute(`
-      CREATE TABLE IF NOT EXISTS sessions (
-        sid TEXT PRIMARY KEY,
-        sess JSONB NOT NULL,
-        expire TIMESTAMP NOT NULL
+      CREATE TABLE IF NOT EXISTS session (
+        sid varchar NOT NULL COLLATE "default",
+        sess json NOT NULL,
+        expire timestamp(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
       );
     `);
 

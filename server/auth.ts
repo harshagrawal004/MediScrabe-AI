@@ -44,8 +44,8 @@ export function setupAuth(app: Express) {
     throw new Error("SESSION_SECRET environment variable is not set");
   }
 
-  // Setup session store
   const sessionStore = new (PostgresStore(session))({
+    tableName: 'session',
     createTableIfMissing: true,
     conObject: {
       connectionString: process.env.DATABASE_URL,
@@ -69,7 +69,6 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure passport local strategy
   passport.use(
     new LocalStrategy(async (username: string, password: string, done) => {
       try {
@@ -111,38 +110,6 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error("Deserialization error:", error);
       done(error);
-    }
-  });
-
-  // Auth routes
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      const { username, password, name } = req.body;
-
-      if (!username || !password || !name) {
-        return res.status(400).json({ message: "All fields are required" });
-      }
-
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-
-      const hashedPassword = await hashPassword(password);
-      const user = await storage.createUser({
-        username,
-        password: hashedPassword,
-        name,
-        role: "user",
-      });
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      next(error);
     }
   });
 
