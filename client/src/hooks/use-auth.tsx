@@ -15,6 +15,7 @@ type AuthContextType = {
   loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  createTestUser: () => Promise<void>; // Added createTestUser function
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      window.location.href = '/app'; // Redirect to /app after successful login
     },
     onError: (error: Error) => {
       toast({
@@ -81,6 +83,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  // Added createTestUser function -  Implementation depends on your database interaction layer
+  const createTestUser = async () => {
+    try {
+      // Replace with your actual database interaction code
+      const newUser = await apiRequest("POST", "/api/createTestUser", { username: "testuser", password: "password123" });
+      console.log("Test user created:", newUser);
+    } catch (error) {
+      console.error("Error creating test user:", error);
+      // Add error handling as needed
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -90,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        createTestUser, // Provide createTestUser function
       }}
     >
       {children}
