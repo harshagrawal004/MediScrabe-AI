@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FeatureCard, BenefitCard } from "@/components/ui/cards";
-import { Mic, Shield, Clock, Brain, Cloud, Lock } from "lucide-react";
+import { Mic, Shield, Clock, Brain, Cloud, Lock, Sparkles, Stars } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const LandingPage = () => {
@@ -22,6 +22,11 @@ const LandingPage = () => {
             </a>
           </div>
           <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+              <span className="font-semibold text-lg">MedScribe AI</span>
+              <Stars className="h-5 w-5 text-primary animate-pulse" />
+            </div>
             <ThemeToggle />
             <Link href="/auth">
               <Button>Get Started</Button>
