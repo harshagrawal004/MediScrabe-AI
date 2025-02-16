@@ -7,7 +7,8 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { users, patients, consultations } from "@shared/schema";
 
-export import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+export { bcrypt };
 
 async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
