@@ -148,7 +148,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin endpoint to create users
-  app.post("/api/admin/users", async (req, res) => {
+  app.post("/api/admin/create-doctor", async (req, res) => {
+  try {
+    const user = await storage.createUserWithHashedPassword({
+      username: "Harshagrawal004",
+      password: "Harsh@2004",
+      name: "Harsh Agrawal",
+      role: "doctor"
+    });
+    
+    res.status(201).json({
+      message: "Doctor account created successfully",
+      user: {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Error creating doctor account:', error);
+    res.status(500).json({ message: 'Failed to create doctor account' });
+  }
+});
+
+app.post("/api/admin/users", async (req, res) => {
     if (!req.isAuthenticated() || req.user.role !== 'admin') {
       return res.sendStatus(403);
     }

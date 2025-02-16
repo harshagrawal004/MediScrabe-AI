@@ -3,6 +3,7 @@ import { User, Patient, Consultation, InsertUser, InsertPatient, InsertConsultat
 import createMemoryStore from "memorystore";
 import session from "express-session";
 import { nanoid } from "nanoid";
+import { hashPassword } from "./auth"; // Added import for password hashing
 
 const MemoryStore = createMemoryStore(session);
 
@@ -33,9 +34,17 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByName(name: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.name === name,
+    );
+  }
+
+
   async createUser(insertUser: InsertUser): Promise<User> {
+    const hashedPassword = await hashPassword(insertUser.password); // Hash the password
     const id = this.currentId.users++;
-    const user: User = { ...insertUser, id, role: "doctor" };
+    const user: User = { ...insertUser, id, password: hashedPassword, role: "doctor" }; //Store hashed password
     this.users.set(id, user);
     return user;
   }
@@ -74,7 +83,7 @@ export class MemStorage implements IStorage {
   async updateConsultation(id: number, updates: Partial<Consultation>): Promise<Consultation> {
     const consultation = await this.getConsultation(id);
     if (!consultation) throw new Error("Consultation not found");
-    
+
     const updated = { ...consultation, ...updates };
     this.consultations.set(id, updated);
     return updated;
