@@ -11,7 +11,7 @@ const LandingPage = () => {
             <div className="flex items-center space-x-8">
               <Link href="/">
                 <div className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
-                  <img src="/logo.png" alt="MedScribe AI Logo" className="h-10 w-10" />
+                  <img src="/logo.png" alt="MedScribe AI Logo" className="h-12 w-12" />
                   <span className="text-2xl font-bold tracking-tight text-primary">
                     MedScribe AI
                   </span>
@@ -45,7 +45,7 @@ const LandingPage = () => {
               <img 
                 src="/logo.png" 
                 alt="MedScribe AI Logo" 
-                className="h-24 w-24 object-contain"
+                className="h-32 w-32 object-contain"
               />
             </div>
 
