@@ -23,8 +23,9 @@ const LandingPage = () => {
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="MedScribe AI Logo" className="h-8 w-8 object-contain" />
+              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
               <span className="font-semibold text-lg">MedScribe AI</span>
+              <Stars className="h-5 w-5 text-primary animate-pulse" />
             </div>
             <ThemeToggle />
             <Link href="/auth">
