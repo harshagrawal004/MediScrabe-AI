@@ -8,7 +8,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+      <nav className="fixed top-0 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container mx-auto flex h-14 items-center justify-between">
           <div className="hidden md:flex space-x-6">
             <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">
