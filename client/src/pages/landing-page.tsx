@@ -36,9 +36,9 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden">
+      <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden bg-gradient-to-b from-background to-primary/5">
         <div className="container relative z-10">
-          <div className="max-w-[900px] mx-auto text-center space-y-8">
+          <div className="max-w-[900px] mx-auto text-center space-y-8 animate-fade-in">
             <div className="flex justify-center mb-8">
               <img src="/logo.png" alt="MedScribe AI Logo" className="h-20 w-20" />
             </div>
