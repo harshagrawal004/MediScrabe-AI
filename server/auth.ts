@@ -6,7 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import PostgresStore from "connect-pg-simple";
-import { db } from "./db";
+import { db, sql } from "./db";
 import { User as SelectUser } from "@shared/schema";
 
 declare global {
