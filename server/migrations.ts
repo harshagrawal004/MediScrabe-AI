@@ -1,12 +1,13 @@
-
 import { db } from "./db";
-import { users, patients, consultations, sessions } from "@shared/schema";
+import { users, records } from "@shared/schema";
 
 export async function migrate() {
   try {
-    // Drop existing tables if needed
-    await db.execute(`DROP TABLE IF EXISTS session CASCADE;`);
-    
+    // Drop existing tables if they exist
+    await db.execute(`DROP TABLE IF EXISTS users CASCADE;`);
+    await db.execute(`DROP TABLE IF EXISTS sessions CASCADE;`);
+    await db.execute(`DROP TABLE IF EXISTS records CASCADE;`);
+
     // Create tables if they don't exist
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
@@ -14,31 +15,22 @@ export async function migrate() {
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
         name TEXT NOT NULL,
-        role TEXT NOT NULL DEFAULT 'doctor'
+        role TEXT NOT NULL DEFAULT 'user',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
 
     await db.execute(`
-      CREATE TABLE IF NOT EXISTS patients (
+      CREATE TABLE IF NOT EXISTS records (
         id SERIAL PRIMARY KEY,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        age INTEGER NOT NULL,
-        gender TEXT NOT NULL,
-        patient_id TEXT NOT NULL UNIQUE
-      );
-    `);
-
-    await db.execute(`
-      CREATE TABLE IF NOT EXISTS consultations (
-        id SERIAL PRIMARY KEY,
-        patient_id INTEGER NOT NULL,
-        doctor_id INTEGER NOT NULL,
-        date TIMESTAMP NOT NULL DEFAULT NOW(),
-        status TEXT NOT NULL DEFAULT 'pending',
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        transcription TEXT,
         audio_url TEXT,
-        transcription JSONB,
-        duration INTEGER
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
 

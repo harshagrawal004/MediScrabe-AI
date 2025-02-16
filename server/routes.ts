@@ -14,7 +14,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: "testdoctor",
         password: "testpassword",
         name: "Test Doctor",
-        role: "user"
+        role: "user" as const
       };
 
       // Check if user already exists

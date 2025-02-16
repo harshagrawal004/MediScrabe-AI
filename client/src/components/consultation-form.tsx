@@ -10,47 +10,41 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { insertPatientSchema, type InsertPatient } from "@shared/schema";
+import { insertRecordSchema, type InsertRecord } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 
 interface ConsultationFormProps {
-  onSuccess: (patientId: number) => void;
+  onSuccess: (recordId: number) => void;
   onCancel: () => void;
 }
 
 export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps) {
   const { toast } = useToast();
-  const form = useForm<InsertPatient>({
-    resolver: zodResolver(insertPatientSchema),
+  const form = useForm<InsertRecord>({
+    resolver: zodResolver(insertRecordSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      age: 0,
-      gender: "male",
+      title: "",
+      content: "",
+      transcription: "",
+      audioUrl: "",
+      metadata: {},
     },
   });
 
-  const createPatient = useMutation({
-    mutationFn: async (data: InsertPatient) => {
-      const res = await apiRequest("POST", "/api/patients", data);
+  const createRecord = useMutation({
+    mutationFn: async (data: InsertRecord) => {
+      const res = await apiRequest("POST", "/api/records", data);
       return res.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/consultations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/records"] });
       onSuccess(data.id);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error creating patient",
+        title: "Error creating record",
         description: error.message,
         variant: "destructive",
       });
@@ -60,17 +54,17 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data) => createPatient.mutate(data))}
+        onSubmit={form.handleSubmit((data) => createRecord.mutate(data))}
         className="space-y-4"
       >
         <FormField
           control={form.control}
-          name="firstName"
+          name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>First Name</FormLabel>
+              <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="Consultation Title" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,57 +73,13 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
 
         <FormField
           control={form.control}
-          name="lastName"
+          name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Last Name</FormLabel>
+              <FormLabel>Notes</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="Initial consultation notes" />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="age"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Age</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Gender</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -141,9 +91,9 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
           </Button>
           <Button
             type="submit"
-            disabled={createPatient.isPending}
+            disabled={createRecord.isPending}
           >
-            Proceed to Recording
+            Start Recording
           </Button>
         </div>
       </form>

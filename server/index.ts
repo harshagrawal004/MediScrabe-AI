@@ -2,12 +2,14 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { migrate } from "./migrations";
 import { setupVite, serveStatic, log } from "./vite";
+import { createServer } from "http";
 
 const app = express();
 // Increase JSON payload limit to 50MB
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
+// Add basic request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -40,6 +42,7 @@ app.use((req, res, next) => {
 
 let server: ReturnType<typeof createServer>;
 
+// Graceful shutdown handler
 process.on('SIGTERM', () => {
   if (server) {
     server.close(() => {
@@ -51,15 +54,22 @@ process.on('SIGTERM', () => {
 
 (async () => {
   try {
-    await migrate(); // Run migrations before starting the server
+    // Ensure session secret is set
+    if (!process.env.SESSION_SECRET) {
+      throw new Error("SESSION_SECRET environment variable is required");
+    }
+
+    // Run migrations before starting the server
+    await migrate();
+
     server = await registerRoutes(app);
 
+    // Global error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      console.error('Server error:', err);
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
-
       res.status(status).json({ message });
-      throw err;
     });
 
     if (app.get("env") === "development") {
@@ -69,8 +79,8 @@ process.on('SIGTERM', () => {
     }
 
     const PORT = Number(process.env.PORT) || 5000;
-    server.listen(PORT, () => {
-      log(`serving on port ${PORT}`);
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
