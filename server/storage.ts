@@ -3,7 +3,6 @@ import { User, InsertUser, Patient, InsertPatient, Consultation, InsertConsultat
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { users, patients, consultations } from "@shared/schema";
-import { hashPassword } from "./auth";
 
 class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
@@ -16,11 +15,6 @@ class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getUserByName(name: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.name, name));
-    return user;
-  }
-
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -29,18 +23,7 @@ class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createUserWithHashedPassword(insertUser: InsertUser): Promise<User> {
-    const hashedPassword = await hashPassword(insertUser.password);
-    const [user] = await db
-      .insert(users)
-      .values({
-        ...insertUser,
-        password: hashedPassword
-      })
-      .returning();
-    return user;
-  }
-
+  // Patient methods
   async createPatient(patient: InsertPatient): Promise<Patient> {
     const [newPatient] = await db
       .insert(patients)
@@ -54,6 +37,7 @@ class DatabaseStorage implements IStorage {
     return patient;
   }
 
+  // Consultation methods
   async createConsultation(consultation: InsertConsultation): Promise<Consultation> {
     const [newConsultation] = await db
       .insert(consultations)

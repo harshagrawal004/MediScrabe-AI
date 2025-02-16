@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertPatientSchema, insertConsultationSchema } from "@shared/schema";
-import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -41,12 +40,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Protected routes
   app.post("/api/patients", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
 
     const parsed = insertPatientSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json(parsed.error);
+      return res.status(400).json({ errors: parsed.error.flatten() });
     }
 
     const patient = await storage.createPatient(parsed.data);
@@ -54,11 +56,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/consultations", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
 
-    const parsed = insertConsultationSchema.safeParse(req.body);
+    const parsed = insertConsultationSchema.safeParse({
+      ...req.body,
+      doctorId: req.user.id,
+    });
+
     if (!parsed.success) {
-      return res.status(400).json(parsed.error);
+      return res.status(400).json({ errors: parsed.error.flatten() });
     }
 
     const consultation = await storage.createConsultation(parsed.data);
@@ -66,7 +74,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/consultations", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
     const consultations = await storage.getDoctorConsultations(req.user.id);
     res.json(consultations);
   });

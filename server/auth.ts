@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import PostgresStore from "connect-pg-simple";
 import { db } from "./db";
 import { User as SelectUser } from "@shared/schema";
+import { z } from "zod";
 
 declare global {
   namespace Express {
@@ -16,6 +17,11 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
+const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -35,20 +41,22 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   if (!process.env.SESSION_SECRET) {
-    console.error("SESSION_SECRET environment variable is not set!");
-    process.exit(1);
+    throw new Error("SESSION_SECRET environment variable is not set");
   }
+
+  // Setup session store
+  const sessionStore = new (PostgresStore(session))({
+    createTableIfMissing: true,
+    conObject: {
+      connectionString: process.env.DATABASE_URL,
+    },
+  });
 
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: new (PostgresStore(session))({
-      createTableIfMissing: true,
-      conObject: {
-        connectionString: process.env.DATABASE_URL,
-      },
-    }),
+    store: sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
@@ -61,36 +69,38 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Configure passport local strategy
   passport.use(
-    new LocalStrategy(async (username: string, password: string, done: Function) => {
+    new LocalStrategy(async (username: string, password: string, done) => {
       try {
-        if (!username || !password) {
-          return done(null, false, { message: "Username and password are required" });
+        const parsed = loginSchema.safeParse({ username, password });
+        if (!parsed.success) {
+          return done(null, false, { message: "Invalid credentials" });
         }
 
         const user = await storage.getUserByUsername(username);
         if (!user) {
-          console.log(`Login attempt failed: User ${username} not found`);
+          console.log(`Login failed: User ${username} not found`);
           return done(null, false, { message: "Invalid username or password" });
         }
 
         const isValid = await comparePasswords(password, user.password);
         if (!isValid) {
-          console.log(`Login attempt failed: Invalid password for user ${username}`);
+          console.log(`Login failed: Invalid password for user ${username}`);
           return done(null, false, { message: "Invalid username or password" });
         }
 
         console.log(`User ${username} logged in successfully`);
         return done(null, user);
       } catch (error) {
-        console.error('Login error:', error);
+        console.error("Login error:", error);
         return done(error);
       }
-    }),
+    })
   );
 
-  passport.serializeUser((user: Express.User, done: Function) => done(null, user.id));
-  passport.deserializeUser(async (id: number, done: Function) => {
+  passport.serializeUser((user: Express.User, done) => done(null, user.id));
+  passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
       if (!user) {
@@ -99,17 +109,18 @@ export function setupAuth(app: Express) {
       }
       done(null, user);
     } catch (error) {
-      console.error('Deserialization error:', error);
+      console.error("Deserialization error:", error);
       done(error);
     }
   });
 
+  // Auth routes
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, name } = req.body;
 
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+      if (!username || !password || !name) {
+        return res.status(400).json({ message: "All fields are required" });
       }
 
       const existingUser = await storage.getUserByUsername(username);
@@ -117,9 +128,12 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      const user = await storage.createUserWithHashedPassword({
-        ...req.body,
-        password,
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword,
+        name,
+        role: "doctor",
       });
 
       req.login(user, (err) => {
@@ -127,7 +141,7 @@ export function setupAuth(app: Express) {
         res.status(201).json(user);
       });
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       next(error);
     }
   });
@@ -135,7 +149,7 @@ export function setupAuth(app: Express) {
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
       if (err) {
-        console.error('Authentication error:', err);
+        console.error("Authentication error:", err);
         return next(err);
       }
       if (!user) {
@@ -143,7 +157,7 @@ export function setupAuth(app: Express) {
       }
       req.login(user, (err) => {
         if (err) {
-          console.error('Login error:', err);
+          console.error("Login error:", err);
           return next(err);
         }
         res.status(200).json(user);
@@ -154,7 +168,7 @@ export function setupAuth(app: Express) {
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {
       if (err) {
-        console.error('Logout error:', err);
+        console.error("Logout error:", err);
         return next(err);
       }
       res.sendStatus(200);
