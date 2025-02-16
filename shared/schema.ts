@@ -15,7 +15,9 @@ export const users = pgTable("users", {
 // Records table to store all consultation data
 export const records = pgTable("records", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   title: text("title").notNull(),
   content: text("content").notNull(),
   transcription: text("transcription"),

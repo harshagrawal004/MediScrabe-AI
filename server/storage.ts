@@ -3,8 +3,21 @@ import { User, InsertUser, Record, InsertRecord } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { users, records } from "@shared/schema";
+import session from "express-session";
+import PostgresStore from "connect-pg-simple";
 
 export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
+
+  constructor() {
+    this.sessionStore = new (PostgresStore(session))({
+      createTableIfMissing: true,
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+      },
+    });
+  }
+
   // User methods
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));

@@ -23,7 +23,7 @@ export async function migrate() {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS records (
         id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES users(id),
         title TEXT NOT NULL,
         content TEXT NOT NULL,
         transcription TEXT,
