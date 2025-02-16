@@ -45,8 +45,12 @@ const LandingPage = () => {
               </div>
             </div>
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary/90 via-primary to-primary/90">
-                MedScribe AI
+              <span className="relative">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-primary to-purple-500 animate-gradient">
+                  Med<span className="font-extrabold">Scribe</span> 
+                  <span className="font-black bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">AI</span>
+                </span>
+                <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-600 via-primary to-purple-500 rounded-full"></span>
               </span>
             </h1>
             <p className="mb-8 text-xl text-muted-foreground">
