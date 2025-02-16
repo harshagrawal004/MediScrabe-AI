@@ -30,10 +30,17 @@ export const consultations = pgTable("consultations", {
   duration: integer("duration"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  name: true,
+export const sessions = pgTable("sessions", {
+  sid: text("sid").primaryKey(),
+  sess: jsonb("sess").notNull(),
+  expire: timestamp("expire").notNull(),
+});
+
+// Create insert schemas
+export const insertUserSchema = createInsertSchema(users).extend({
+  username: z.string().min(3).max(50),
+  password: z.string().min(6),
+  name: z.string().min(2).max(50),
 });
 
 export const insertPatientSchema = createInsertSchema(patients).omit({
@@ -55,15 +62,10 @@ export const insertConsultationSchema = createInsertSchema(consultations).omit({
   duration: true,
 });
 
+// Export types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Patient = typeof patients.$inferSelect;
 export type Consultation = typeof consultations.$inferSelect;
 export type InsertPatient = z.infer<typeof insertPatientSchema>;
 export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
-
-export const sessions = pgTable("sessions", {
-  sid: text("sid").primaryKey(),
-  sess: jsonb("sess").notNull(),
-  expire: timestamp("expire").notNull(),
-});

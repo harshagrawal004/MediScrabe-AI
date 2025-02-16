@@ -1,99 +1,98 @@
 import { type IStorage } from "./types";
 import { User, Patient, Consultation, InsertUser, InsertPatient, InsertConsultation } from "@shared/schema";
-import createMemoryStore from "memorystore";
+import PostgresStore from "connect-pg-simple";
 import session from "express-session";
 import { nanoid } from "nanoid";
-import { hashPassword } from "./auth"; // Added import for password hashing
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { users, patients, consultations } from "@shared/schema";
 
-const MemoryStore = createMemoryStore(session);
-
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private patients: Map<number, Patient>;
-  private consultations: Map<number, Consultation>;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
-  currentId: { users: number; patients: number; consultations: number };
 
   constructor() {
-    this.users = new Map();
-    this.patients = new Map();
-    this.consultations = new Map();
-    this.currentId = { users: 1, patients: 1, consultations: 1 };
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // 24 hours
+    this.sessionStore = new (PostgresStore(session))({
+      createTableIfMissing: true,
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+      },
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async getUserByName(name: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.name === name,
-    );
+    const [user] = await db.select().from(users).where(eq(users.name, name));
+    return user;
   }
 
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const hashedPassword = await hashPassword(insertUser.password); // Hash the password
-    const id = this.currentId.users++;
-    const user: User = { ...insertUser, id, password: hashedPassword, role: "doctor" }; //Store hashed password
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async createPatient(insertPatient: InsertPatient): Promise<Patient> {
-    const id = this.currentId.patients++;
     const patientId = nanoid(10);
-    const patient: Patient = { ...insertPatient, id, patientId };
-    this.patients.set(id, patient);
+    const [patient] = await db
+      .insert(patients)
+      .values({ ...insertPatient, patientId })
+      .returning();
     return patient;
   }
 
   async getPatient(id: number): Promise<Patient | undefined> {
-    return this.patients.get(id);
+    const [patient] = await db.select().from(patients).where(eq(patients.id, id));
+    return patient;
   }
 
   async createConsultation(insertConsultation: InsertConsultation): Promise<Consultation> {
-    const id = this.currentId.consultations++;
-    const consultation: Consultation = {
-      ...insertConsultation,
-      id,
-      date: new Date(),
-      status: "pending",
-      audioUrl: null,
-      transcription: null,
-      duration: null,
-    };
-    this.consultations.set(id, consultation);
+    const [consultation] = await db
+      .insert(consultations)
+      .values({
+        ...insertConsultation,
+        date: new Date(),
+        status: "pending",
+        audioUrl: null,
+        transcription: null,
+        duration: null,
+      })
+      .returning();
     return consultation;
   }
 
   async getConsultation(id: number): Promise<Consultation | undefined> {
-    return this.consultations.get(id);
+    const [consultation] = await db
+      .select()
+      .from(consultations)
+      .where(eq(consultations.id, id));
+    return consultation;
   }
 
   async updateConsultation(id: number, updates: Partial<Consultation>): Promise<Consultation> {
-    const consultation = await this.getConsultation(id);
-    if (!consultation) throw new Error("Consultation not found");
-
-    const updated = { ...consultation, ...updates };
-    this.consultations.set(id, updated);
-    return updated;
+    const [consultation] = await db
+      .update(consultations)
+      .set(updates)
+      .where(eq(consultations.id, id))
+      .returning();
+    return consultation;
   }
 
   async getDoctorConsultations(doctorId: number): Promise<Consultation[]> {
-    return Array.from(this.consultations.values())
-      .filter(c => c.doctorId === doctorId)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    return db
+      .select()
+      .from(consultations)
+      .where(eq(consultations.doctorId, doctorId))
+      .orderBy(consultations.date);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
