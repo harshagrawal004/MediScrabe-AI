@@ -150,12 +150,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to create users
   app.post("/api/admin/create-doctor", async (req, res) => {
   try {
-    const user = await storage.createUserWithHashedPassword({
+    const doctorData = {
       username: "Harshagrawal004",
-      password: "Harsh@2004",
+      password: "Harsh@2004", 
       name: "Harsh Agrawal",
       role: "doctor"
-    });
+    };
+
+    // Check if user already exists
+    const existingUser = await storage.getUserByUsername(doctorData.username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const user = await storage.createUserWithHashedPassword(doctorData);
     
     res.status(201).json({
       message: "Doctor account created successfully",
