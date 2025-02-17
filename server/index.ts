@@ -1,15 +1,15 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { migrate } from "./migrations";
 import { setupVite, serveStatic, log } from "./vite";
 import { createServer } from "http";
 
 const app = express();
-// Increase JSON payload limit to 50MB
+
+// Basic middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Add basic request logging middleware
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -28,15 +28,12 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
-
   next();
 });
 
@@ -54,14 +51,6 @@ process.on('SIGTERM', () => {
 
 (async () => {
   try {
-    // Ensure session secret is set
-    if (!process.env.SESSION_SECRET) {
-      throw new Error("SESSION_SECRET environment variable is required");
-    }
-
-    // Run migrations before starting the server
-    await migrate();
-
     server = await registerRoutes(app);
 
     // Global error handler
