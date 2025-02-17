@@ -67,7 +67,7 @@ process.on('SIGTERM', () => {
       serveStatic(app);
     }
 
-    const PORT = Number(process.env.PORT) || 3000;
+    const PORT = Number(process.env.PORT) || 3001; //Port updated here
     server.listen(PORT, "0.0.0.0", () => {
       log(`Server running on port ${PORT}`);
     });
