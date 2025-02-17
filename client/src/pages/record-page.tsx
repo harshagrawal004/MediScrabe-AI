@@ -3,11 +3,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { ConsultationForm } from "@/components/consultation-form";
 import { RecordingControls } from "@/components/recording-controls";
 import { useLocation } from "wouter";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 enum RecordingState {
   PATIENT_FORM,
@@ -26,101 +26,46 @@ export default function RecordPage() {
       if (!patientId || !user) return;
 
       try {
-        // First create the consultation
-        const consultationRes = await apiRequest("POST", "/api/consultations", {
-          patientId,
-          doctorId: user.id,
-        });
-        const consultation = await consultationRes.json();
-
-        // Compress and convert audio blob to base64
-        const compressedBlob = await new Promise<Blob>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            // Create a new compressed audio blob
-            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const arrayBuffer = reader.result as ArrayBuffer;
-            audioContext.decodeAudioData(arrayBuffer, (buffer) => {
-              // Create a lower quality offline context (mono, 8kHz)
-              const offlineContext = new OfflineAudioContext(
-                1, // mono
-                Math.floor(buffer.length * 8000 / buffer.sampleRate), // resample to 8kHz
-                8000 // 8kHz sample rate
-              );
-
-              const source = offlineContext.createBufferSource();
-              source.buffer = buffer;
-
-              // Add compression
-              const compressor = offlineContext.createDynamicsCompressor();
-              compressor.threshold.value = -24;
-              compressor.knee.value = 30;
-              compressor.ratio.value = 12;
-              compressor.attack.value = 0.003;
-              compressor.release.value = 0.25;
-
-              source.connect(compressor);
-              compressor.connect(offlineContext.destination);
-
-              source.start();
-              offlineContext.startRendering().then((renderedBuffer) => {
-                const wavBlob = bufferToWav(renderedBuffer, 8000);
-                resolve(wavBlob);
-              }).catch(reject);
-            }, reject);
-          };
-          reader.onerror = reject;
-          reader.readAsArrayBuffer(audioBlob);
-        });
-
-        // Convert compressed blob to base64
+        // Convert audio blob to base64
         const base64Audio = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => {
-            const base64String = reader.result as string;
-            const base64Data = base64String.split(',')[1]; // Remove data URL prefix
-
-            // Check size before sending
-            const sizeInMB = (base64Data.length * 0.75) / (1024 * 1024); // Convert base64 length to MB
-            if (sizeInMB > 45) { // Allow some buffer from the 50MB limit
-              reject(new Error('Recording is too large. Please try a shorter recording.'));
-              return;
-            }
-
-            resolve(base64Data);
+            const base64 = reader.result as string;
+            resolve(base64.split(',')[1]); // Remove data URL prefix
           };
           reader.onerror = reject;
-          reader.readAsDataURL(compressedBlob);
+          reader.readAsDataURL(audioBlob);
         });
 
-        // Send audio file and metadata to server
-        await apiRequest("PATCH", `/api/consultations/${consultation.id}`, {
-          audioData: base64Audio,
-          duration: Math.floor(compressedBlob.size / 1000), // More accurate duration estimate
-          status: "processing",
-        });
+        // Create consultation record in Supabase
+        const { data: consultation, error } = await supabase
+          .from('consultations')
+          .insert({
+            patient_id: patientId,
+            doctor_id: user.id,
+            date: new Date().toISOString(),
+            audio_data: base64Audio,
+            status: 'processing',
+            duration: Math.floor(audioBlob.size / 1000) // Approximate duration
+          })
+          .select()
+          .single();
 
+        if (error) throw error;
         return consultation;
       } catch (error) {
-        if (error instanceof Error) {
-          if (error.message.includes('413')) {
-            throw new Error('The recording is too large. Please try a shorter recording.');
-          } else if (error.message.includes('too large')) {
-            throw error; // Propagate our custom size error
-          }
-        }
-        throw new Error('Failed to save recording. Please try again.');
+        console.error('Error creating consultation:', error);
+        throw new Error('Failed to save consultation. Please try again.');
       }
     },
     onSuccess: (consultation) => {
       if (!consultation) return;
 
-      queryClient.invalidateQueries({ queryKey: ["/api/consultations"] });
       toast({
         title: "Recording saved",
         description: "Your consultation is being processed...",
       });
-      navigate(`/results/${consultation.id}`);
+      navigate(`/app/results/${consultation.id}`);
     },
     onError: (error: Error) => {
       toast({
@@ -131,67 +76,12 @@ export default function RecordPage() {
     },
   });
 
-  // Helper function to convert AudioBuffer to WAV blob
-  function bufferToWav(buffer: AudioBuffer, sampleRate: number): Blob {
-    const numOfChan = buffer.numberOfChannels;
-    const length = buffer.length * numOfChan * 2;
-    const view = new DataView(new ArrayBuffer(44 + length));
-
-    // Write WAV header
-    writeString(view, 0, 'RIFF');
-    view.setUint32(4, 36 + length, true);
-    writeString(view, 8, 'WAVE');
-    writeString(view, 12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numOfChan, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2 * numOfChan, true);
-    view.setUint16(32, numOfChan * 2, true);
-    view.setUint16(34, 16, true);
-    writeString(view, 36, 'data');
-    view.setUint32(40, length, true);
-
-    // Write audio data with dynamic range compression
-    const data = new Float32Array(buffer.length * numOfChan);
-    let offset = 44;
-    for (let i = 0; i < buffer.numberOfChannels; i++) {
-      const channel = buffer.getChannelData(i);
-      for (let j = 0; j < channel.length; j++) {
-        // Apply soft knee compression
-        let sample = channel[j];
-        const threshold = 0.5;
-        const knee = 0.1;
-        const ratio = 4;
-
-        if (Math.abs(sample) > threshold + knee) {
-          sample = threshold + (Math.abs(sample) - threshold) / ratio * Math.sign(sample);
-        } else if (Math.abs(sample) > threshold - knee) {
-          const T = threshold - knee;
-          const a = (Math.abs(sample) - T) / (2 * knee);
-          sample = T + (1 - 1/ratio) * Math.pow(a, 2) * 2 * knee * Math.sign(sample);
-        }
-
-        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-        offset += 2;
-      }
-    }
-
-    return new Blob([view], { type: 'audio/wav' });
-  }
-
-  function writeString(view: DataView, offset: number, string: string) {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="bg-background/95 border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate("/")}>
+            <Button variant="ghost" onClick={() => navigate("/app")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -212,7 +102,7 @@ export default function RecordPage() {
                 setPatientId(id);
                 setState(RecordingState.RECORDING);
               }}
-              onCancel={() => navigate("/")}
+              onCancel={() => navigate("/app")}
             />
           </div>
         ) : (

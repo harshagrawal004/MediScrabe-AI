@@ -12,6 +12,8 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing-page";
 import { ThemeProvider } from "./components/theme-provider"
 import { ThemeToggle } from "./components/theme-toggle"
+import { useEffect } from "react";
+import { initializeSupabaseTables } from "./lib/supabase-init";
 
 function Router() {
   return (
@@ -27,6 +29,11 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    // Initialize Supabase tables when the app starts
+    initializeSupabaseTables().catch(console.error);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light">
