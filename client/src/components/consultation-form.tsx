@@ -10,41 +10,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { insertRecordSchema, type InsertRecord } from "@shared/schema";
+import { insertPatientSchema, type InsertPatient } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 
 interface ConsultationFormProps {
-  onSuccess: (recordId: number) => void;
+  onSuccess: (patientId: number) => void;
   onCancel: () => void;
 }
 
 export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps) {
   const { toast } = useToast();
-  const form = useForm<InsertRecord>({
-    resolver: zodResolver(insertRecordSchema),
+  const form = useForm<InsertPatient>({
+    resolver: zodResolver(insertPatientSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      transcription: "",
-      audioUrl: "",
-      metadata: {},
+      name: "",
+      identifier: "",
     },
   });
 
-  const createRecord = useMutation({
-    mutationFn: async (data: InsertRecord) => {
-      const res = await apiRequest("POST", "/api/records", data);
+  const createPatient = useMutation({
+    mutationFn: async (data: InsertPatient) => {
+      const res = await apiRequest("POST", "/api/patients", data);
       return res.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/records"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
       onSuccess(data.id);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error creating record",
+        title: "Error creating patient record",
         description: error.message,
         variant: "destructive",
       });
@@ -54,17 +51,17 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data) => createRecord.mutate(data))}
+        onSubmit={form.handleSubmit((data) => createPatient.mutate(data))}
         className="space-y-4"
       >
         <FormField
           control={form.control}
-          name="title"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>Patient Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Consultation Title" />
+                <Input {...field} placeholder="Enter patient's full name" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,12 +70,12 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
 
         <FormField
           control={form.control}
-          name="content"
+          name="identifier"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel>Patient ID</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Initial consultation notes" />
+                <Input {...field} placeholder="Enter medical record number" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,7 +88,7 @@ export function ConsultationForm({ onSuccess, onCancel }: ConsultationFormProps)
           </Button>
           <Button
             type="submit"
-            disabled={createRecord.isPending}
+            disabled={createPatient.isPending}
           >
             Start Recording
           </Button>

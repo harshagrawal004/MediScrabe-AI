@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Consultation } from "@shared/schema";
+import { type Consultation } from "@shared/schema";
 import { ArrowLeft, Download, FileAudio, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -13,7 +13,7 @@ export default function ResultsPage() {
   const { data: consultation, isLoading } = useQuery<Consultation>({
     queryKey: ["/api/consultations", consultationId],
     enabled: !!consultationId,
-    refetchInterval: (data) =>
+    refetchInterval: (data: Consultation | undefined) =>
       data?.status === "processing" ? 5000 : false, // Poll every 5s while processing
   });
 
@@ -25,7 +25,7 @@ export default function ResultsPage() {
     );
   }
 
-  const transcription = consultation.transcription as any;
+  const transcription = consultation.transcription;
 
   return (
     <div className="min-h-screen bg-background">

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Mic, Pause, Play, Square, Save } from "lucide-react";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface RecordingControlsProps {
   onComplete: (audioBlob: Blob) => void;
@@ -23,10 +23,11 @@ export function RecordingControls({ onComplete }: RecordingControlsProps) {
 
   const [audioLevel, setAudioLevel] = useState(0);
 
-  // Simulate audio level changes
-  useState(() => {
+  // Simulate audio level changes with useEffect
+  useEffect(() => {
+    let interval: number;
     if (isRecording && !isPaused) {
-      const interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setAudioLevel(Math.random() * 100);
       }, 100);
       return () => clearInterval(interval);

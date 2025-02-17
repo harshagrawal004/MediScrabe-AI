@@ -12,19 +12,29 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Records table to store all consultation data
-export const records = pgTable("records", {
+// Patients table to store patient information
+export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
+  name: text("name").notNull(),
+  identifier: text("identifier").notNull(), // Medical record number or other unique identifier
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Consultations table to store consultation sessions
+export const consultations = pgTable("consultations", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
+  doctorId: integer("doctor_id")
     .notNull()
     .references(() => users.id),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  transcription: text("transcription"),
-  audioUrl: text("audio_url"),
-  metadata: jsonb("metadata").default({}),
+  date: timestamp("date").notNull().defaultNow(),
+  duration: integer("duration"), // in seconds
+  status: text("status").notNull().default("pending"), // pending, processing, completed, error
+  audioData: text("audio_data"), // base64 encoded audio data
+  transcription: jsonb("transcription").default({}), // Stores both text and summary
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Create insert schemas with proper validation
@@ -35,18 +45,27 @@ export const insertUserSchema = createInsertSchema(users, {
   role: z.enum(["user", "admin", "doctor"]).default("user"),
 }).omit({ id: true, createdAt: true });
 
-export const insertRecordSchema = createInsertSchema(records, {
-  userId: z.number(),
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
-  transcription: z.string().optional(),
-  audioUrl: z.string().optional(),
-  metadata: z.record(z.unknown()).optional(),
-}).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertPatientSchema = createInsertSchema(patients, {
+  name: z.string().min(2, "Patient name is required"),
+  identifier: z.string().min(1, "Patient identifier is required"),
+}).omit({ id: true, createdAt: true });
+
+export const insertConsultationSchema = createInsertSchema(consultations, {
+  patientId: z.number().int().positive(),
+  doctorId: z.number().int().positive(),
+  date: z.date().default(() => new Date()),
+  duration: z.number().int().optional(),
+  status: z.enum(["pending", "processing", "completed", "error"]).default("pending"),
+  audioData: z.string().optional(),
+  transcription: z.record(z.unknown()).optional(),
+}).omit({ id: true, createdAt: true });
 
 // Export types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-export type InsertRecord = z.infer<typeof insertRecordSchema>;
-export type Record = typeof records.$inferSelect;
+export type InsertPatient = z.infer<typeof insertPatientSchema>;
+export type Patient = typeof patients.$inferSelect;
+
+export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
+export type Consultation = typeof consultations.$inferSelect;
