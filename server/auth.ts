@@ -143,9 +143,11 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    res.json(req.user);
+    // Temporary mock user
+    res.json({ 
+      id: 1,
+      username: "temporary_user",
+      name: "Temporary User"
+    });
   });
 }
